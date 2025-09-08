@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Protocol - Transforming CAPTCHAs into Economic Value</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.05) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--gray);
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: white;
+            padding: 60px 20px;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        /* Contracts Table Section */
+        .contracts-section {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            padding: 80px 20px;
+        }
+
+        .contracts-table {
+            width: 100%;
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .contracts-table thead {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .contracts-table th,
+        .contracts-table td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        .contracts-table tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .contracts-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .contract-address {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .view-btn {
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .view-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Section Styles */
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Problem Section */
+        .problem {
+            padding: 80px 20px;
+            background: linear-gradient(180deg, var(--light) 0%, white 100%);
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .problem-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .problem-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        /* Solution Section */
+        .solution {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .solution-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .solution-text h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .solution-text p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .solution-visual {
+            background: var(--gradient);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(79, 70, 229, 0.3);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Architecture Section */
+        .architecture {
+            padding: 80px 20px;
+            background: linear-gradient(180deg, white 0%, var(--light) 100%);
+        }
+
+        .architecture-diagram {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-top: 40px;
+        }
+
+        .flow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .flow-item {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 20px;
+            background: var(--light);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .flow-item::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .flow-item:last-child::after {
+            display: none;
+        }
+
+        .flow-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 15px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        /* Interactive Dashboard */
+        .dashboard-section {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1100px;
+            margin: 40px auto;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, #f3f4f6 0%, white 100%);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-card h3 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .dashboard-widget {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .avs-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .network-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--primary);
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary);
+            padding: 16px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .solution-content { grid-template-columns: 1fr; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .flow-item::after { display: none; }
+            .contracts-table { font-size: 0.85rem; }
+            .contracts-table th,
+            .contracts-table td { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Canvas Protocol</h1>
+            <p class="tagline">Transforming 500M Daily CAPTCHAs into Economic Value</p>
+            <p style="font-size: 1.1rem; color: var(--gray); margin-bottom: 30px;">
+                Building a Verifiable Application on EigenLayer that creates the first marketplace for human attention
+                <span class="avs-badge">Powered by Othentic AVS</span>
+            </p>
+            <div class="hero-buttons">
+                <a href="https://rosarkar.github.io/captcha_demo_v2/" target="_blank" class="btn btn-primary">
+                    🎮 Try Live Demo
+                </a>
+                <a href="https://rosarkar.github.io/canvas_flowchart/" target="_blank" class="btn btn-secondary">
+                    📊 View Ecosystem
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">500M+</div>
+                    <div class="stat-label">Daily CAPTCHAs Solved</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">$0</div>
+                    <div class="stat-label">Current Economic Value</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">$100M+</div>
+                    <div class="stat-label">Potential Annual Volume</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">3 Months</div>
+                    <div class="stat-label">From Idea to Working AVS</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Deployed Contracts Section -->
+    <section class="contracts-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">🔗 Deployed Contracts</h2>
+                <p class="section-subtitle">Live on Testnet - Click to Verify</p>
+            </div>
+            <table class="contracts-table">
+                <thead>
+                    <tr>
+                        <th>Contract</th>
+                        <th>Network</th>
+                        <th>Address</th>
+                        <th style="text-align: center;">Explorer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>AvsGovernance</strong></td>
+                        <td>Holesky (L1)</td>
+                        <td class="contract-address">0xae9D927D64035A6134E29b95fbDF62979B45bB4c</td>
+                        <td style="text-align: center;">
+                            <a href="https://holesky.etherscan.io/address/0xae9D927D64035A6134E29b95fbDF62979B45bB4c" target="_blank" class="view-btn">
+                                View →
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>AttestationCenter</strong></td>
+                        <td>Base Sepolia (L2)</td>
+                        <td class="contract-address">0x5036a44Ff627dC12967064d48f68a0AD5D1A9173</td>
+                        <td style="text-align: center;">
+                            <a href="https://sepolia.basescan.org/address/0x5036a44Ff627dC12967064d48f68a0AD5D1A9173" target="_blank" class="view-btn">
+                                View →
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>AvsTreasury</strong></td>
+                        <td>Holesky (L1)</td>
+                        <td class="contract-address">0x1Fb45c551f0473693a1994d82A48F4310A77B956</td>
+                        <td style="text-align: center;">
+                            <a href="https://holesky.etherscan.io/address/0x1Fb45c551f0473693a1994d82A48F4310A77B956" target="_blank" class="view-btn">
+                                View →
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>L2MessageHandler</strong></td>
+                        <td>Base Sepolia (L2)</td>
+                        <td class="contract-address">0xaD064729bBf20e1B38297dc914B5D326ED8684A7</td>
+                        <td style="text-align: center;">
+                            <a href="https://sepolia.basescan.org/address/0xaD064729bBf20e1B38297dc914B5D326ED8684A7" target="_blank" class="view-btn">
+                                View →
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">The Problem: CAPTCHAs Are Broken</h2>
+                <p class="section-subtitle">
+                    Every day, humanity wastes millions of hours clicking fire hydrants and crosswalks, 
+                    generating zero economic value for anyone except Google
+                </p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">👤</div>
+                    <h3>Users Waste Time</h3>
+                    <p>500+ million daily verifications with frustrating, repetitive tasks that add no value to the user experience</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🌐</div>
+                    <h3>Publishers Get Nothing</h3>
+                    <p>Websites pay for bot protection infrastructure but receive zero revenue from this critical security layer</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">📊</div>
+                    <h3>Lost Economic Value</h3>
+                    <p>Captive human attention worth billions annually is completely ignored by the current system</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="solution">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">The Solution: A Marketplace for Human Attention</h2>
+                <p class="section-subtitle">
+                    Canvas Protocol transforms CAPTCHAs into valuable ad inventory, 
+                    creating a win-win ecosystem powered by EigenLayer AVS technology
+                </p>
+            </div>
+            <div class="solution-content">
+                <div class="solution-text">
+                    <h3>How It Works</h3>
+                    <p>✅ <strong>Publishers</strong> monetize their bot protection by auctioning CAPTCHA slots</p>
+                    <p>✅ <strong>Advertisers</strong> get guaranteed human engagement with cryptographic proof</p>
+                    <p>✅ <strong>Users</strong> complete engaging brand interactions instead of clicking traffic lights</p>
+                    <p>✅ <strong>AVS Operators</strong> validate interactions and earn rewards for securing the network</p>
+                    <p>✅ <strong>Redistribution Protection</strong> leverages EigenLayer's ELIP-006 to compensate harmed parties if verification fails</p>
+                    
+                    <div style="margin-top: 30px;">
+                        <span class="network-badge">🔗 Deployed on Base Sepolia</span>
+                        <span class="network-badge" style="margin-left: 10px;">🔗 AVS on Holesky</span>
+                    </div>
+                </div>
+                <div class="solution-visual">
+                    <h3 style="margin-bottom: 25px;">Live Implementation</h3>
+                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <p style="margin-bottom: 10px;">✓ Working AVS deployed</p>
+                        <p style="margin-bottom: 10px;">✓ Functional marketplace</p>
+                        <p style="margin-bottom: 10px;">✓ Interactive CAPTCHA games</p>
+                        <p>✓ On-chain verification</p>
+                    </div>
+                    <p style="font-size: 0.9rem; opacity: 0.9;">
+                        Built with Othentic Stack for rapid AVS development
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section class="architecture">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">EigenLayer AVS Architecture</h2>
+                <p class="section-subtitle">
+                    Leveraging Othentic's infrastructure with EigenLayer's redistributable slashing for verifiable proofs of human interaction
+                </p>
+            </div>
+            <div class="architecture-diagram">
+                <div class="flow-container">
+                    <div class="flow-item">
+                        <div class="flow-icon">🌐</div>
+                        <h4>Publisher SDK</h4>
+                        <p>Embeds Canvas Protocol</p>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">💰</div>
+                        <h4>Advertiser Bids</h4>
+                        <p>Places bid for CAPTCHA slot</p>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">🎮</div>
+                        <h4>User Interaction</h4>
+                        <p>Completes CAPTCHA game</p>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">🔍</div>
+                        <h4>AVS Validation</h4>
+                        <p>Operators verify interaction</p>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">📝</div>
+                        <h4>On-Chain Proof</h4>
+                        <p>Attestation recorded</p>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">💸</div>
+                        <h4>Settlement</h4>
+                        <p>Automatic payments</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%); border-radius: 12px; border-left: 4px solid var(--primary);">
+                    <h4 style="margin-bottom: 15px; color: var(--dark);">💰 External Capital for EigenLayer Ecosystem</h4>
+                    <p style="color: var(--gray); font-size: 0.95rem; line-height: 1.6;">
+                        Canvas Protocol uniquely bridges the $700B global advertising industry with EigenLayer's cryptoeconomic security:
+                    </p>
+                    <ul style="margin-top: 10px; color: var(--gray); font-size: 0.95rem; list-style-position: inside;">
+                        <li>Brings fresh capital from traditional marketing budgets into the ecosystem</li>
+                        <li>Creates sustainable, bear-market-resistant yield for restakers and operators</li>
+                        <li>Proves blockchain infrastructure can capture real-world revenue beyond DeFi</li>
+                        <li>Operators earn fees for every verified human interaction, paid by advertisers</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%); border-radius: 12px; border-left: 4px solid var(--success);">
+                    <h4 style="margin-bottom: 15px; color: var(--dark);">🛡️ Redistributable Slashing Protection</h4>
+                    <p style="color: var(--gray); font-size: 0.95rem; line-height: 1.6;">
+                        Canvas Protocol leverages EigenLayer's ELIP-006 redistributable slashing mechanism. If verification errors occur:
+                    </p>
+                    <ul style="margin-top: 10px; color: var(--gray); font-size: 0.95rem; list-style-position: inside;">
+                        <li>Operators who provide incorrect attestations are slashed</li>
+                        <li>Slashed funds are redistributed to compensate affected parties (publishers/advertisers)</li>
+                        <li>Creates an insurance layer protecting all marketplace participants</li>
+                        <li>Ensures cryptoeconomic alignment without burning value</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Dashboard Section -->
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Interactive Marketplace Dashboard</h2>
+                <p class="section-subtitle">See how publishers and advertisers interact in real-time</p>
+            </div>
+            <div class="dashboard-grid">
+                <!-- Publisher Dashboard -->
+                <div class="dashboard-card">
+                    <h3>📊 Publisher Dashboard</h3>
+                    <div class="dashboard-widget">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-weight: 600;">Active Inventory</span>
+                            <span class="status-badge">LIVE</span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--gray);">
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                <span>CAPTCHA Slots:</span>
+                                <span style="font-weight: 600;">2,500/hour</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                <span>Floor Price:</span>
+                                <span style="font-weight: 600; color: var(--primary);">$0.02</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-widget">
+                        <h4 style="font-size: 1rem; margin-bottom: 10px;">Active Bids</h4>
+                        <div id="publisherBids">
+                            <div style="padding: 8px; background: #f9fafb; border-radius: 4px; margin-bottom: 8px; border-left: 3px solid var(--primary);">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>🍔 BurgerBonanza</span>
+                                    <span style="color: var(--success); font-weight: 600;">$0.035</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="acceptBid()" class="action-button">Accept Highest Bid</button>
+                </div>
+
+                <!-- Advertiser Dashboard -->
+                <div class="dashboard-card">
+                    <h3>🎯 Advertiser Dashboard</h3>
+                    <div class="dashboard-widget">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-weight: 600;">Campaign Status</span>
+                            <span class="status-badge" style="background: var(--primary);">ACTIVE</span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--gray);">
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                <span>Budget Remaining:</span>
+                                <span style="font-weight: 600;">$450.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                <span>Verified Humans:</span>
+                                <span style="font-weight: 600; color: var(--success);">1,247</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-widget">
+                        <h4 style="font-size: 1rem; margin-bottom: 10px;">Place New Bid</h4>
+                        <input type="number" id="bidAmount" value="0.035" step="0.001" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 4px; margin-bottom: 10px;">
+                        <div id="bidStatus" style="font-size: 0.85rem; color: var(--gray);">
+                            Est. reach: 2,500 verified humans/hour
+                        </div>
+                    </div>
+                    <button onclick="placeBid()" class="action-button" style="background: var(--gradient);">Submit Bid</button>
+                </div>
+            </div>
+            
+            <!-- Flow Status -->
+            <div style="margin-top: 30px; padding: 20px; background: linear-gradient(90deg, rgba(79, 70, 229, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%); border-radius: 12px; text-align: center; max-width: 1100px; margin: 30px auto;">
+                <div id="flowStatus" style="font-weight: 600; color: var(--dark); margin-bottom: 20px;">
+                    💡 Marketplace Status: Waiting for bid acceptance...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Economics Section -->
+    <section class="solution" style="background: white;">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Unit Economics</h2>
+                <p class="section-subtitle">Real revenue potential for publishers</p>
+            </div>
+            <div style="max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); padding: 30px; border-radius: 16px; border: 1px solid rgba(79, 70, 229, 0.2);">
+                    <h3 style="color: var(--dark); margin-bottom: 20px;">Mid-Tier Publisher Example</h3>
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                            <span style="color: var(--gray);">Daily Visitors</span>
+                            <span style="font-weight: 600; color: var(--dark);">10,000</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                            <span style="color: var(--gray);">CAPTCHA Display Rate</span>
+                            <span style="font-weight: 600; color: var(--dark);">10%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                            <span style="color: var(--gray);">Daily Verifications</span>
+                            <span style="font-weight: 600; color: var(--dark);">1,000</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                            <span style="color: var(--gray);">Revenue per CAPTCHA</span>
+                            <span style="font-weight: 600; color: var(--dark);">$0.03</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 15px 0; background: rgba(79, 70, 229, 0.1); margin-top: 15px; padding-left: 10px; padding-right: 10px; border-radius: 8px;">
+                            <span style="font-weight: 600; color: var(--primary);">Monthly Revenue</span>
+                            <span style="font-weight: 700; font-size: 1.3rem; color: var(--primary);">$900</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(79, 70, 229, 0.05) 100%); padding: 30px; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <h3 style="color: var(--dark); margin-bottom: 20px;">Revenue Comparison</h3>
+                    <div style="margin-bottom: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="font-weight: 600; color: var(--dark);">Canvas Protocol</span>
+                                <span style="font-weight: 700; color: var(--success);">$900/month</span>
+                            </div>
+                            <div style="height: 24px; background: linear-gradient(90deg, var(--success) 0%, var(--success) 100%); border-radius: 4px;"></div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="font-weight: 600; color: var(--dark);">Display Ads (3% CTR)</span>
+                                <span style="font-weight: 600; color: var(--gray);">$450/month</span>
+                            </div>
+                            <div style="height: 24px; background: var(--gray); border-radius: 4px; width: 50%;"></div>
+                        </div>
+                        
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="font-weight: 600; color: var(--dark);">Current CAPTCHA</span>
+                                <span style="font-weight: 600; color: var(--gray);">$0/month</span>
+                            </div>
+                            <div style="height: 24px; background: #e2e8f0; border-radius: 4px; width: 1%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="padding: 15px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; margin-top: 20px;">
+                        <p style="font-size: 0.9rem; color: var(--dark); margin: 0;">
+                            <strong>2x higher revenue</strong> than traditional display advertising with better user experience
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px; padding: 25px; background: var(--light); border-radius: 12px; max-width: 800px; margin: 40px auto;">
+                <h4 style="color: var(--dark); margin-bottom: 15px;">Market Opportunity at Scale</h4>
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 30px;">
+                    <div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary);">500M+</div>
+                        <div style="color: var(--gray); font-size: 0.9rem;">Daily CAPTCHAs Globally</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary);">$0.03</div>
+                        <div style="color: var(--gray); font-size: 0.9rem;">Average Value per CAPTCHA</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary);">$5.4B</div>
+                        <div style="color: var(--gray); font-size: 0.9rem;">Total Addressable Market</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="solution" style="background: linear-gradient(180deg, var(--light) 0%, white 100%);">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-subtitle">Addressing common concerns about Canvas Protocol</p>
+            </div>
+            <div style="max-width: 900px; margin: 0 auto;">
+                <div style="margin-bottom: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                    <h3 style="color: var(--dark); margin-bottom: 15px; font-size: 1.3rem;">What if publishers don't want to annoy users?</h3>
+                    <p style="color: var(--gray); line-height: 1.8;">
+                        Canvas CAPTCHAs transform verification into engaging brand mini-games that users actually enjoy. Publishers control frequency through smart targeting - once per unique IP, after viewing multiple pages, or randomized sampling. The free market naturally balances user experience with revenue. If verification frequency impacts traffic, publishers adjust accordingly. We provide the infrastructure; market dynamics create the equilibrium.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                    <h3 style="color: var(--dark); margin-bottom: 15px; font-size: 1.3rem;">How do you prevent CAPTCHA fatigue?</h3>
+                    <p style="color: var(--gray); line-height: 1.8;">
+                        Market forces inherently prevent overuse. Publishers who implement excessive CAPTCHAs see traffic decline, directly impacting revenue. This creates natural pressure to optimize frequency. Additionally, our varied game mechanics and rotating brand experiences keep interactions fresh. Publishers can A/B test different frequencies to find their optimal balance between monetization and user retention.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                    <h3 style="color: var(--dark); margin-bottom: 15px; font-size: 1.3rem;">How do you ensure operator reliability?</h3>
+                    <p style="color: var(--gray); line-height: 1.8;">
+                        EigenLayer's cryptoeconomic security model incentivizes honest behavior through staking requirements and slashing mechanisms. Operators risk significant capital if they provide false attestations. Our redistributable slashing implementation means any collusion attempts result in immediate financial losses that compensate affected parties. The decentralized operator set and random selection further minimize coordination risks.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                    <h3 style="color: var(--dark); margin-bottom: 15px; font-size: 1.3rem;">How do you handle regulatory compliance?</h3>
+                    <p style="color: var(--gray); line-height: 1.8;">
+                        Canvas Protocol implements industry-standard KYC/AML procedures for advertisers and publishers, ensuring full regulatory compliance. We're building a legitimate business infrastructure that respects jurisdictional requirements. Our approach prioritizes seamless onboarding while maintaining necessary compliance checks. We're studying best practices from leading Web3 platforms to create a frictionless yet compliant user experience.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                    <h3 style="color: var(--dark); margin-bottom: 15px; font-size: 1.3rem;">Why blockchain instead of traditional infrastructure?</h3>
+                    <p style="color: var(--gray); line-height: 1.8;">
+                        Blockchain provides transparent, verifiable proof of human interaction that traditional systems cannot match. Every CAPTCHA completion creates an immutable on-chain record, eliminating ad fraud and ensuring advertisers only pay for genuine engagement. Smart contracts automate payments, removing intermediaries and reducing costs. The decentralized architecture prevents any single entity from controlling or manipulating the verification process.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                    <h3 style="color: var(--dark); margin-bottom: 15px; font-size: 1.3rem;">What's your go-to-market strategy?</h3>
+                    <p style="color: var(--gray); line-height: 1.8;">
+                        We're targeting mid-tier publishers (10K-100K daily visitors) who struggle with traditional ad revenue but maintain quality content. These sites need alternative monetization without compromising user experience. Initial focus includes tech blogs, gaming sites, and educational platforms where users expect some friction for free content. Our SDK requires minimal integration - just a few lines of code - making adoption straightforward.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Powered By Section -->
+    <section style="padding: 60px 20px; background: white; border-top: 1px solid #e2e8f0;">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h3 style="color: var(--dark); font-size: 1.5rem; margin-bottom: 10px;">Powered By</h3>
+                <p style="color: var(--gray);">Built on cutting-edge blockchain infrastructure</p>
+            </div>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 80px; flex-wrap: wrap;">
+                <div style="text-align: center;">
+                    <a href="https://base.org" target="_blank" style="text-decoration: none; color: #0052FF; font-size: 2rem; font-weight: 700;">
+                        Base
+                    </a>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="https://othentic.xyz" target="_blank" style="text-decoration: none; color: #2c2c2c; font-size: 2rem; font-weight: 700;">
+                        Othentic
+                    </a>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="https://eigenlayer.xyz" target="_blank" style="text-decoration: none; color: #291A52; font-size: 2rem; font-weight: 700;">
+                        EigenLayer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Founder Section -->
+    <section class="solution">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Founder Profile</h2>
+            </div>
+            <div style="max-width: 900px; margin: 0 auto; background: var(--light); border-radius: 20px; padding: 40px;">
+                <h3 style="color: var(--dark); margin-bottom: 15px;">Rohit Sarkar</h3>
+                <p style="color: var(--primary); font-weight: 600; margin-bottom: 20px;">Founder & Builder | Content Lead at Caldera</p>
+                <p style="color: var(--gray); line-height: 1.8; margin-bottom: 20px;">
+                    Currently serving as Content Lead at Caldera (a leading Rollups-as-a-Service platform backed by Founders Fund and Sequoia), 
+                    Rohit brings a wealth of experience in Ethereum scaling solutions and Layer 2/3 technologies. 
+                    His background includes pivotal roles such as Research Lead at InfStones and Protocol Specialist at Figment, 
+                    both of which are among the largest PoS node operators and key participants in the EigenLayer ecosystem.
+                </p>
+                <p style="color: var(--gray); line-height: 1.8; margin-bottom: 20px;">
+                    Starting with basic programming knowledge, Rohit taught himself the full stack required to build Canvas Protocol - 
+                    from Solidity smart contracts to Node.js backends and Docker deployment. In just 3 months, he went from concept to 
+                    deploying working AVS contracts on Base Sepolia and Holesky, building functional marketplace demos, and processing 
+                    live transactions. This demonstrates not just technical capability, but the determination and rapid learning ability 
+                    crucial for startup success.
+                </p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <span style="background: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; color: var(--primary); border: 1px solid var(--primary);">
+                        🎓 Applied Statistics - UofT
+                    </span>
+                    <a href="https://www.youtube.com/watch?v=poxxucX_O_s" target="_blank" style="background: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; color: var(--primary); border: 1px solid var(--primary); text-decoration: none; display: inline-block;">
+                        🚀 ETHDenver 2024 Speaker
+                    </a>
+                    <a href="https://www.linkedin.com/in/rohit-sarkar-094a68126/" target="_blank" style="background: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; color: var(--primary); border: 1px solid var(--primary); text-decoration: none; display: inline-block;">
+                        💼 Ex-InfStones Research Lead
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section style="padding: 100px 20px; background: var(--gradient); text-align: center; color: white;">
+        <div class="container">
+            <h2 style="font-size: 3rem; margin-bottom: 20px;">Ready to Transform Web Verification?</h2>
+            <p style="font-size: 1.3rem; margin-bottom: 40px; opacity: 0.95;">
+                Join us in building the infrastructure to price human attention
+            </p>
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <a href="mailto:rosarkar@gmail.com" class="btn-white">📧 Contact Rohit</a>
+                <a href="https://x.com/_rosark" target="_blank" class="btn-white">🐦 Follow on X</a>
+                <a href="https://github.com/rosarkar" target="_blank" class="btn-white">💻 View GitHub</a>
+                <a href="https://rosarkar.github.io/canvas_flowchart/" target="_blank" class="btn-white">📊 Ecosystem Details</a>
+            </div>
+            <div style="margin-top: 40px; opacity: 0.9;">
+                <p style="font-size: 1rem;">
+                    🏆 Applying for EigenLayer EIR Program<br>
+                    <span style="font-size: 0.9rem;">With referrals from Othentic & EigenLayer team members</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://rosarkar.github.io/captcha_demo_v2/" target="_blank">Demo</a>
+                <a href="https://rosarkar.github.io/canvas_flowchart/" target="_blank">Flowchart</a>
+                <a href="https://docs.othentic.xyz" target="_blank">Othentic Docs</a>
+                <a href="https://eigenlayer.xyz" target="_blank">EigenLayer</a>
+                <a href="https://x.com/_rosark" target="_blank">X/Twitter</a>
+            </div>
+            <p style="opacity: 0.7; font-size: 0.9rem;">
+                © 2025 Canvas Protocol - Building the Future of Web Verification on EigenLayer
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Interactive Dashboard Functions
+        function placeBid() {
+            const bidAmount = document.getElementById('bidAmount').value;
+            const flowStatus = document.getElementById('flowStatus');
+            const bidStatus = document.getElementById('bidStatus');
+            
+            flowStatus.innerHTML = '📤 New bid submitted: $' + bidAmount + ' per verification';
+            bidStatus.innerHTML = '✅ Bid placed! Waiting for publisher acceptance...';
+            
+            // Update publisher dashboard
+            setTimeout(() => {
+                const publisherBids = document.getElementById('publisherBids');
+                publisherBids.innerHTML = `
+                    <div style="padding: 8px; background: #fef3c7; border-radius: 4px; margin-bottom: 8px; border-left: 3px solid #f59e0b;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🍔 BurgerBonanza (New)</span>
+                            <span style="color: #f59e0b; font-weight: 600;">$${bidAmount}</span>
+                        </div>
+                    </div>
+                ` + publisherBids.innerHTML;
+            }, 500);
+        }
+
+        function acceptBid() {
+            const flowStatus = document.getElementById('flowStatus');
+            flowStatus.innerHTML = '✅ Bid accepted! AVS verification initiated → Settlement processing...';
+            
+            setTimeout(() => {
+                flowStatus.innerHTML = '🎉 Transaction complete! Publisher earned $0.035, Advertiser received verified human interaction';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
