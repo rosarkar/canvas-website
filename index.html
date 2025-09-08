@@ -300,6 +300,25 @@
             overflow: hidden;
         }
 
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(79, 70, 229, 0.3);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         /* Architecture Section */
         .architecture {
             padding: 80px 20px;
@@ -516,7 +535,6 @@
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
     <section class="hero">
         <div class="container">
             <h1>Canvas Protocol</h1>
@@ -536,7 +554,6 @@
         </div>
     </section>
 
-    <!-- Stats Section -->
     <section class="stats">
         <div class="container">
             <div class="stats-grid">
@@ -560,7 +577,6 @@
         </div>
     </section>
 
-    <!-- Deployed Contracts Section -->
     <section class="contracts-section">
         <div class="container">
             <div class="section-header">
@@ -622,7 +638,6 @@
         </div>
     </section>
 
-    <!-- Problem Section -->
     <section class="problem">
         <div class="container">
             <div class="section-header">
@@ -652,7 +667,6 @@
         </div>
     </section>
 
-    <!-- Solution Section -->
     <section class="solution">
         <div class="container">
             <div class="section-header">
@@ -676,23 +690,18 @@
                         <span class="network-badge" style="margin-left: 10px;">🔗 AVS on Holesky</span>
                     </div>
                 </div>
-                <div class="solution-visual">
-                    <h3 style="margin-bottom: 25px;">Live Implementation</h3>
-                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-                        <p style="margin-bottom: 10px;">✓ Working AVS deployed</p>
-                        <p style="margin-bottom: 10px;">✓ Functional marketplace</p>
-                        <p style="margin-bottom: 10px;">✓ Interactive CAPTCHA games</p>
-                        <p>✓ On-chain verification</p>
-                    </div>
-                    <p style="font-size: 0.9rem; opacity: 0.9;">
-                        Built with Othentic Stack for rapid AVS development
-                    </p>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/dT3ao_STrso" 
+                            title="Canvas Protocol EigenLayer AVS Demo" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                    </iframe>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Architecture Section -->
     <section class="architecture">
         <div class="container">
             <div class="section-header">
@@ -764,7 +773,6 @@
         </div>
     </section>
 
-    <!-- Interactive Dashboard Section -->
     <section class="dashboard-section">
         <div class="container">
             <div class="section-header">
@@ -772,7 +780,6 @@
                 <p class="section-subtitle">See how publishers and advertisers interact in real-time</p>
             </div>
             <div class="dashboard-grid">
-                <!-- Publisher Dashboard -->
                 <div class="dashboard-card">
                     <h3>📊 Publisher Dashboard</h3>
                     <div class="dashboard-widget">
@@ -805,7 +812,6 @@
                     <button onclick="acceptBid()" class="action-button">Accept Highest Bid</button>
                 </div>
 
-                <!-- Advertiser Dashboard -->
                 <div class="dashboard-card">
                     <h3>🎯 Advertiser Dashboard</h3>
                     <div class="dashboard-widget">
@@ -835,7 +841,6 @@
                 </div>
             </div>
             
-            <!-- Flow Status -->
             <div style="margin-top: 30px; padding: 20px; background: linear-gradient(90deg, rgba(79, 70, 229, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%); border-radius: 12px; text-align: center; max-width: 1100px; margin: 30px auto;">
                 <div id="flowStatus" style="font-weight: 600; color: var(--dark); margin-bottom: 20px;">
                     💡 Marketplace Status: Waiting for bid acceptance...
@@ -844,7 +849,6 @@
         </div>
     </section>
 
-    <!-- Economics Section -->
     <section class="solution" style="background: white;">
         <div class="container">
             <div class="section-header">
@@ -934,7 +938,6 @@
         </div>
     </section>
 
-    <!-- FAQ Section -->
     <section class="solution" style="background: linear-gradient(180deg, var(--light) 0%, white 100%);">
         <div class="container">
             <div class="section-header">
@@ -987,7 +990,6 @@
         </div>
     </section>
 
-    <!-- Powered By Section -->
     <section style="padding: 60px 20px; background: white; border-top: 1px solid #e2e8f0;">
         <div class="container">
             <div style="text-align: center; margin-bottom: 40px;">
@@ -1016,7 +1018,6 @@
         </div>
     </section>
 
-    <!-- Founder Section -->
     <section class="solution">
         <div class="container">
             <div class="section-header">
@@ -1053,7 +1054,6 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
     <section style="padding: 100px 20px; background: var(--gradient); text-align: center; color: white;">
         <div class="container">
             <h2 style="font-size: 3rem; margin-bottom: 20px;">Ready to Transform Web Verification?</h2>
@@ -1074,7 +1074,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-links">
